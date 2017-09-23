@@ -1,0 +1,8 @@
+﻿NPC Info:
+Display combat information of NPC.
+
+*** Acknowledgments ***
+Most of this Mod's code is based on jopojelly's Recipe Browser.
+I am grateful to Mr. jopojelly for publishing a great code.
+In addition, Mod Settings uses Mod Settings Configurator.
+I am grateful to Mr. Flashkirby99 for making the setting of Mod easy.
