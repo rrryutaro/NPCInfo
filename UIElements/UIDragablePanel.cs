@@ -161,6 +161,16 @@ namespace NPCInfo.UIElements
                 Left.Pixels = pos.X;
                 Width.Pixels = pos.Width;
                 Height.Pixels = pos.Height;
+
+                if (Main.screenHeight < Top.Pixels)
+                {
+                    Top.Pixels = Main.screenHeight - Height.Pixels;
+                }
+                if (Main.screenWidth < Left.Pixels)
+                {
+                    Left.Pixels = Main.screenWidth - Width.Pixels;
+                }
+
                 Recalculate();
             }
         }
