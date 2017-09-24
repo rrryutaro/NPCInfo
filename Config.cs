@@ -32,7 +32,7 @@ namespace NPCInfo
             config.Save();
         }
 
-        public static bool isLock = true;
+        public static bool isLock = false;
         public static int timeOut = 30;
     }
 }

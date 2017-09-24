@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.UI;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -67,14 +68,14 @@ namespace NPCInfo
             panelMain = new UINPCInfoMainPanel(true, true, true);
             panelMain.caption = caption;
             panelMain.SetPadding(6);
-			panelMain.Left.Set(1300f, 0f);
-			panelMain.Top.Set(440f, 0f);
-			panelMain.Width.Set(290f, 0f);
-			panelMain.MinWidth.Set(100f, 0f);
-			panelMain.MaxWidth.Set(1600f, 0f);
+            panelMain.Left.Set(400f, 0f);
+            panelMain.Top.Set(400f, 0f);
+            panelMain.Width.Set(290f, 0f);
+			panelMain.MinWidth.Set(290f, 0f);
+			panelMain.MaxWidth.Set(Main.screenWidth, 0f);
 			panelMain.Height.Set(290, 0f);
-			panelMain.MinHeight.Set(100, 0f);
-			panelMain.MaxHeight.Set(900, 0f);
+			panelMain.MinHeight.Set(114, 0f);
+			panelMain.MaxHeight.Set(Main.screenHeight, 0f);
 
 			Texture2D texture = ModLoader.GetMod("NPCInfo").GetTexture("UIElements/closeButton");
 			closeButton = new UIHoverImageButton(texture, "Close");
