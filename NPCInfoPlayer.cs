@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria;
+﻿using Terraria;
 using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using Terraria.DataStructures;
 
 namespace NPCInfo
 {
@@ -49,6 +43,11 @@ namespace NPCInfo
             if (npcInfoData != null)
             {
                 NPCInfoUI.instance.Load(npcInfoData);
+            }
+
+            if (Config.isOutputDropInfo)
+            {
+                NPCDropInfoUtils.OutputDropInfo();
             }
         }
     }

@@ -81,6 +81,12 @@ namespace NPCInfo.UIElements
                     Utils.DrawBorderStringFourWay(Main.spriteBatch, Main.fontMouseText, texts[i], pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
                     pos.X += Main.fontMouseText.MeasureString(texts[i]).X + 8;
                 }
+
+                if (IsMouseHovering)
+                {
+                    Tool.tooltip = $"DropItem:";
+                    NPCInfo.instance.npcInfoTool.targetNPC = npc;
+                }
             }
             catch (Exception ex)
             {

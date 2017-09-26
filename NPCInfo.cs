@@ -1,14 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.UI;
 using Terraria.ModLoader;
 using FKTModSettings;
 using NPCInfo.UIElements;
+using Newtonsoft.Json;
 
 namespace NPCInfo
 {
 	class NPCInfo : Mod
 	{
+        internal static string pathNPCDropInfo = $@"{Main.SavePath}\NPCDropInfo.json";
+
         internal static NPCInfo instance;
         internal bool LoadedFKTModSettings = false;
         internal ModHotKey ToggleHotKeyNPCInfo;
@@ -28,15 +32,15 @@ namespace NPCInfo
         {
             instance = this;
 
-            UINPCSlot.textures = new Microsoft.Xna.Framework.Graphics.Texture2D[] {
-                Main.heartTexture.Resize(22),
-                Main.itemTexture[3507].Resize(12),
-                Main.EquipPageTexture[0].Resize(12),
-                Main.itemTexture[156].Resize(12),
-            };
-
             if (!Main.dedServ)
             {
+                UINPCSlot.textures = new Microsoft.Xna.Framework.Graphics.Texture2D[] {
+                    Main.heartTexture.Resize(22),
+                    Main.itemTexture[3507].Resize(12),
+                    Main.EquipPageTexture[0].Resize(12),
+                    Main.itemTexture[156].Resize(12),
+                };
+
                 ToggleHotKeyNPCInfo = RegisterHotKey("Toggle NPC Info", "X");
                 npcInfoTool = new NPCInfoTool();
 
@@ -75,6 +79,7 @@ namespace NPCInfo
             ModSetting setting = ModSettingsAPI.CreateModSettingConfig(this);
             setting.AddBool("isLock", "NPC Info ui position lock", false);
             setting.AddInt("timeOut", "Display time of npc", 5, 60, false);
+            setting.AddBool("isDisplayDropInfo", "Display drop info", false);
         }
 
         private void UpdateModSettings()
@@ -84,6 +89,7 @@ namespace NPCInfo
             {
                 setting.Get("isLock", ref Config.isLock);
                 setting.Get("timeOut", ref Config.timeOut);
+                setting.Get("isDisplayDropInfo", ref Config.isDisplayDropInfo);
             }
         }
 
@@ -101,6 +107,28 @@ namespace NPCInfo
                 },
                 InterfaceScaleType.UI)
             );
+
+            layerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+            if (layerIndex != -1)
+            {
+                layers.Insert(layerIndex, new LegacyGameInterfaceLayer(
+                    "NPCInfo: Drop Item",
+                    delegate
+                    {
+                        npcInfoTool.TooltipDraw();
+                        return true;
+                    },
+                    InterfaceScaleType.UI)
+                );
+            }
+        }
+
+        public override void AddRecipes()
+        {
+            if (!Main.dedServ)
+            {
+                npcInfoTool.CreateModItemDictionary();
+            }
         }
     }
 }
