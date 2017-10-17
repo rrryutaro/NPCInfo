@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.ID;
 using Terraria.UI;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -31,12 +34,20 @@ namespace NPCInfo
         internal UIHoverImageButton closeButton;
         internal UIPanel inlaidPanel;
 		internal UIGrid gridNPC;
+		internal UIImageListButton btnViewMode;
+		internal UIImageListButton btnSpawnNPCFilter;
 
 		internal bool updateNeeded;
 
         internal string caption = $"NPC Info v{NPCInfo.instance.Version} Count:0";
 
-        private bool showNPCInfo;
+		static internal int menuIconSize = 28;
+		static internal int menuMargin = 4;
+
+		private Dictionary<int, int> dicSpawnNPC = new Dictionary<int, int>();
+		private Dictionary<int, int> dicDropItem = new Dictionary<int, int>();
+
+		private bool showNPCInfo;
 		public bool ShowNPCInfo
         {
 			get { return showNPCInfo; }
@@ -73,8 +84,8 @@ namespace NPCInfo
             panelMain.Width.Set(290f, 0f);
 			panelMain.MinWidth.Set(290f, 0f);
 			panelMain.MaxWidth.Set(Main.screenWidth, 0f);
-			panelMain.Height.Set(290, 0f);
-			panelMain.MinHeight.Set(114, 0f);
+			panelMain.Height.Set(298, 0f);
+			panelMain.MinHeight.Set(124, 0f);
 			panelMain.MaxHeight.Set(Main.screenHeight, 0f);
 
 			Texture2D texture = ModLoader.GetMod("NPCInfo").GetTexture("UIElements/closeButton");
@@ -86,9 +97,9 @@ namespace NPCInfo
 
 			inlaidPanel = new UIPanel();
 			inlaidPanel.SetPadding(5);
-			inlaidPanel.Top.Pixels = 24;
+			inlaidPanel.Top.Pixels = 32;
 			inlaidPanel.Width.Set(0, 1f);
-			inlaidPanel.Height.Set(-40, 1f);
+			inlaidPanel.Height.Set(-50, 1f);
 			panelMain.Append(inlaidPanel);
 
 			gridNPC = new UIGrid();
@@ -104,6 +115,66 @@ namespace NPCInfo
 			inlaidPanel.Append(lootItemsScrollbar);
 			gridNPC.SetScrollbar(lootItemsScrollbar);
 
+			int leftPos = menuMargin;
+			btnViewMode = new UIImageListButton(
+				new List<Texture2D>() {
+					Main.itemTexture[ItemID.AlphabetStatue1].Resize(menuIconSize),
+					Main.itemTexture[ItemID.AlphabetStatue2].Resize(menuIconSize),
+					Main.itemTexture[ItemID.AlphabetStatue3].Resize(menuIconSize)},
+				new List<object>() { ViewMode.CombatNPC, ViewMode.SpawnNPC, ViewMode.DropItem },
+				new List<string>() { "Combat NPC", "Spawn NPC", "Drop Item" });
+			btnViewMode.OnClick += (a, b) =>
+			{
+				btnViewMode.NextIamge();
+				ChangeViewMode();
+			};
+			btnViewMode.OnRightClick += (a, b) =>
+			{
+				btnViewMode.PrevIamge();
+				ChangeViewMode();
+			};
+			btnViewMode.Left.Set(leftPos, 0f);
+			btnViewMode.Top.Set(0f, 0f);
+			panelMain.Append(btnViewMode);
+
+			btnSpawnNPCFilter = new UIImageListButton(
+				new List<Texture2D>() {
+					Main.itemTexture[ItemID.AlphabetStatue1].Resize(menuIconSize),
+					Main.itemTexture[ItemID.AlphabetStatue2].Resize(menuIconSize)},
+				new List<object>() { SpawnNPCFilter.All, SpawnNPCFilter.HideTownNPC },
+				new List<string>() { "Spawn NPC: All", "Spawn NPC: Hide twon NPC" });
+			btnSpawnNPCFilter.OnClick += (a, b) =>
+			{
+				btnSpawnNPCFilter.NextIamge();
+				ChangeSpawnNPCFilter();
+			};
+			btnSpawnNPCFilter.OnRightClick += (a, b) =>
+			{
+				btnSpawnNPCFilter.PrevIamge();
+				ChangeSpawnNPCFilter();
+			};
+			leftPos += menuIconSize + menuMargin;
+			btnSpawnNPCFilter.Left.Set(leftPos, 0f);
+			btnSpawnNPCFilter.Top.Set(0f, 0f);
+
+			updateNeeded = true;
+		}
+
+		private void ChangeViewMode()
+		{
+			gridNPC.Clear();
+			updateNeeded = true;
+			InfoCombat.isUpdate = true;
+			if (ViewMode == ViewMode.SpawnNPC)
+				panelMain.Append(btnSpawnNPCFilter);
+			else
+				panelMain.RemoveChild(btnSpawnNPCFilter);
+		}
+
+		private void ChangeSpawnNPCFilter()
+		{
+			gridNPC.Clear();
+			dicSpawnNPC.Clear();
 			updateNeeded = true;
 		}
 
@@ -115,25 +186,111 @@ namespace NPCInfo
 
             gridNPC.Clear();
 
-            int sortOrder = 1;
-            foreach (var type in InfoCombat.sortedInfo.Values)
+			if (ViewMode == ViewMode.CombatNPC)
 			{
-                var info = InfoCombat.combatNPC[type];
-                info.slot.sortOrder = sortOrder++;
-                gridNPC._items.Add(info.slot);
-				gridNPC._innerList.Append(info.slot);
+				int sortOrder = InfoCombat.sortedInfo.Values.Count;
+				foreach (var type in InfoCombat.sortedInfo.Values)
+				{
+					var info = InfoCombat.combatNPC[type];
+					info.slot.sortOrder = sortOrder--;
+					gridNPC._items.Add(info.slot);
+					gridNPC._innerList.Append(info.slot);
+				}
 			}
-			gridNPC.UpdateOrder();
-			gridNPC._innerList.Recalculate();
+			else if (ViewMode == ViewMode.SpawnNPC)
+			{
+				foreach (var key in dicSpawnNPC.Keys)
+				{
+					var slot = new UISpawnNPCSlot(key, dicSpawnNPC[key]);
+					gridNPC._items.Add(slot);
+					gridNPC._innerList.Append(slot);
+				}
+			}
+			else if (ViewMode == ViewMode.DropItem)
+			{
+				foreach (var key in dicDropItem.Keys)
+				{
+					var slot = new UIItemSlot(key, dicDropItem[key]);
+					gridNPC._items.Add(slot);
+					gridNPC._innerList.Append(slot);
+				}
+			}
+			try
+			{
+				gridNPC.UpdateOrder();
+				gridNPC._innerList.Recalculate();
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.Write(ex.Message);
+			}
 
-            panelMain.caption = caption.Replace("Count:0", $"Count: { gridNPC._items.Count}");
+			string replaceCaption = "Count:0";
+			switch (ViewMode)
+			{
+				case ViewMode.CombatNPC:
+					replaceCaption = $"Count: {gridNPC._items.Count}";
+					break;
+
+				case ViewMode.SpawnNPC:
+					replaceCaption = $"Count: {gridNPC._items.Count} ({Main.npc.Count(x => x.active)})";
+					break;
+
+				case ViewMode.DropItem:
+					replaceCaption = $"Count: {gridNPC._items.Count} ({Main.item.Count(x => x.active)})";
+					break;
+			}
+
+            panelMain.caption = caption.Replace("Count:0", replaceCaption);
         }
+
+		public ViewMode ViewMode
+		{
+			get
+			{
+				return btnViewMode.GetValue<ViewMode>();
+			}
+		}
 
 		public override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
-            InfoCombat.Update();
-            updateNeeded = InfoCombat.isUpdate;
+			switch (ViewMode)
+			{
+				case ViewMode.CombatNPC:
+					InfoCombat.Update();
+					updateNeeded = InfoCombat.isUpdate;
+					break;
+
+				case ViewMode.SpawnNPC:
+					var bFilterTown = btnSpawnNPCFilter.GetValue<SpawnNPCFilter>() == SpawnNPCFilter.HideTownNPC;
+					var npcList = Main.npc.Where(x => x.active && (bFilterTown ? !x.townNPC : true)).GroupBy(x => x.netID);
+					if (dicSpawnNPC.Count != npcList.Count() || dicSpawnNPC.Sum(x => x.Value) != npcList.Sum(x => x.Count()))
+					{
+						dicSpawnNPC.Clear();
+						foreach (var npc in npcList)
+							dicSpawnNPC.Add(npc.ToArray()[0].netID, npc.Count());
+
+						updateNeeded = true;
+					}
+					break;
+
+				case ViewMode.DropItem:
+					var itemList = Main.item.Where(x => x.active).GroupBy(x => x.netID);
+					if (dicDropItem.Count != itemList.Count() || dicDropItem.Sum(x=> x.Value) != itemList.Sum(x => x.Sum(y => y.stack)))
+					{
+						dicDropItem.Clear();
+						foreach (var item in itemList)
+							dicDropItem.Add(item.ToArray()[0].netID, item.Sum(x => x.stack));
+						updateNeeded = true;
+					}
+
+					break;
+
+			}
+			if (ViewMode == ViewMode.CombatNPC)
+			{
+			}
             UpdateGrid();
 		}
 
@@ -157,4 +314,16 @@ namespace NPCInfo
             }
         }
     }
+
+	enum ViewMode
+	{
+		CombatNPC,
+		SpawnNPC,
+		DropItem,
+	}
+	enum SpawnNPCFilter
+	{
+		All,
+		HideTownNPC,
+	}
 }

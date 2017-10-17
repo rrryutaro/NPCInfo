@@ -10,12 +10,12 @@ namespace NPCInfo
     {
         public DateTime timeStart;
         public DateTime timeUpdate;
-        public UINPCSlot slot;
+        public UICombatNPCSlot slot;
         public CombatNPCInfo(NPC npc)
         {
             timeStart = DateTime.Now;
             timeUpdate = DateTime.Now;
-            slot = new UINPCSlot((NPC)npc.Clone());
+            slot = new UICombatNPCSlot((NPC)npc.Clone());
         }
         public string GetSortedKey()
         {

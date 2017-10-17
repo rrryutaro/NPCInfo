@@ -1,6 +1,7 @@
 ﻿NPC Info:
 Display combat information of NPC.
 When you move the cursor to NPC information, drop information is displayed.
+By switching the button, information on the NPC that is spawning, information on the item being dropped is displayed.
 
 - About drop information -
 Drop information is not accurate information.
@@ -10,12 +11,7 @@ Drop information also includes information on Thorium, Tremor, and Calamity.
 By editing the file you can change the drop information.
 
 - About the case of wanting to obtain drop information of other Mod -
-** Caution **
-World information may be broken.
-It is strongly recommended that you back up in advance.
-** Caution **
-
-Config isOutputDropInfo of the configuration setting to true will output drop information of all NPCs when entering the world.
+Setting isOutputDropInfo of the configuration setting to true causes all NPC drop information to be output when loading mod.
 Since this setting is not displayed in Mod Settings Configurator, please directly edit NPCInfo.json.
 
 *** Acknowledgments ***

@@ -3,64 +3,61 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.ID;
 using Terraria.Utilities;
 using Terraria.ModLoader;
 using Newtonsoft.Json;
 
 namespace NPCInfo
 {
-    public class NPCDropInfo
+	public class DropItem
+	{
+		public int id;
+		public string mod;
+		public string name;
+		public int min;
+		public int max;
+		public DropItem()
+		{
+		}
+		public DropItem(Item item)
+		{
+			id = item.netID;
+			name = item.Name;
+			if (item.modItem != null)
+			{
+				mod = item.modItem.mod.Name;
+				name = item.modItem.Name;
+			}
+			min = max = 1;
+		}
+	}
+
+	public class DropItemList
+	{
+		public int rate;
+		public bool expert;
+		public List<DropItem> items = new List<DropItem>();
+	}
+
+	public class NPCDropInfo
     {
-        public int NPCType;
-        public string ModName;
-        public string NPCName;
-        public class DropItem
-        {
-            public int ItemType;
-            public string ModName;
-            public string ItemName;
-            public int Chance;
-            public DropItem()
-            {
-            }
-            public DropItem(Item item)
-            {
-                ItemType = item.type;
-                ItemName = item.Name;
-                if (item.modItem != null)
-                {
-                    ModName = item.modItem.mod.Name;
-                    ItemName = item.modItem.Name;
-                }
-            }
-        }
-        public List<DropItem> Items = new List<DropItem>();
+        public int id;
+        public string mod;
+        public string name;
+        public List<DropItemList> list = new List<DropItemList>();
 
         public NPCDropInfo()
         {
         }
 
-        public NPCDropInfo(NPC npc, List<Item> dropItems, List<Item> chanceItems)
+        public NPCDropInfo(NPC npc)
         {
-            NPCType = npc.type;
-            NPCName = npc.FullName;
+            id = npc.netID;
+            name = npc.FullName;
             if (npc.modNPC != null)
             {
-                ModName = npc.modNPC.mod.Name;
-            }
-            foreach (var item in dropItems)
-            {
-                DropItem dropItem = new DropItem(item);
-                var chanceItem = chanceItems.Where(x => x.type == dropItem.ItemType).ToArray();
-                if (0 < chanceItem.Length)
-                {
-                    dropItem.Chance = chanceItem[0].value;
-                }
-                else
-                {
-                    dropItem.Chance = 0;
-                }
-                Items.Add(dropItem);
+                mod = npc.modNPC.mod.Name;
             }
         }
     }
@@ -98,13 +95,12 @@ namespace NPCInfo
 
     public static class NPCDropInfoUtils
     {
-        private static List<Item> listChanceItems = new List<Item>();
-
         public static void OutputDropInfo()
         {
             using (StreamWriter sw = new StreamWriter(new FileStream(NPCInfo.pathNPCDropInfo, FileMode.Create, FileAccess.Write, FileShare.ReadWrite), System.Text.Encoding.UTF8))
             {
-                sw.Write(JsonConvert.SerializeObject(NPCDropInfoUtils.GetNPCDropInfoList()));
+				NPCInfoTool.listDropInfo = NPCDropInfoUtils.GetNPCDropInfoList();
+				sw.Write(JsonConvert.SerializeObject(NPCInfoTool.listDropInfo));
             }
         }
 
@@ -112,45 +108,56 @@ namespace NPCInfo
         {
             List<NPCDropInfo> result = new List<NPCDropInfo>();
 
-            var rand = Main.rand;
-            Main.rand = new NPCDropInfoUnifiedRandom();
+			var rand = Main.rand;
+			bool expertMode = Main.expertMode;
+			Main.rand = new LootUnifiedRandom();
+			Main.expertMode = false;
 
-            NPCDropInfoGlobalItem.OnSetDefaults += NPCDropInfoGlobalItem_OnSetDefaults;
+			for (int netID = -65; netID < NPCLoader.NPCCount; netID++)
+			//int netID = 1;
+			{
+				NPC npc = new NPC();
+				npc.SetDefaults(netID);
+				for (int i = 0; i < 100; i++)
+				{
+					try
+					{
+						LootUnifiedRandom.NextLoop(i);
+						npc.NPCLoot();
+					}
+					catch (Exception ex)
+					{
+						System.Diagnostics.Debug.WriteLine($"{netID}: {ex.Message}");
+					}
+				}
+				var info = new NPCDropInfo(npc);
+				foreach (var a in LootUnifiedRandom.list)
+				{
+					foreach (var b in a.list.Where(x => 0 < x.items.Count))
+					{
+						var list = new DropItemList();
+						list.rate = b.maxValue;
+						list.expert = Main.expertMode;
+						foreach (var c in b.items)
+						{
+							if (!info.list.Any(x => x.items.Any(y => y.id == c.Value.netID)) && !list.items.Any(x => x.id == c.Value.netID))
+								list.items.Add(new DropItem(c.Value));
+						}
+						if (0 < list.items.Count)
+						{
+							info.list.Add(list);
+						}
+					}
+				}
+				if (0 < info.list.Count)
+				{
+					result.Add(info);
+				}
+			}
+			Main.rand = rand;
+			Main.expertMode = expertMode;
 
-            int npcID = 0;
-            for (int type = 1; type < NPCLoader.NPCCount; type++)
-            {
-                try
-                {
-                    NPC npc = new NPC();
-                    npc.SetDefaults(type);
-
-                    listChanceItems.Clear();
-
-                    NPCDropInfoUnifiedRandom.npcID = npcID;
-                    npc.NPCLoot();
-                    var list = Main.item.Where(x => 0 < x.type).ToList();
-                    result.Add(new NPCDropInfo(npc, list, listChanceItems));
-
-                    list.ForEach(x => x.SetDefaults(0));
-
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"{type}: {ex.Message}");
-                }
-            }
-
-            Main.rand = rand;
-            NPCDropInfoGlobalItem.OnSetDefaults -= NPCDropInfoGlobalItem_OnSetDefaults;
-
-            return result;
-        }
-
-        private static void NPCDropInfoGlobalItem_OnSetDefaults(Item obj)
-        {
-            obj.value = NPCDropInfoUnifiedRandom.LastMaxValue;
-            listChanceItems.Add(obj);
+			return result;
         }
     }
 }

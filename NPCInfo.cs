@@ -34,7 +34,7 @@ namespace NPCInfo
 
             if (!Main.dedServ)
             {
-                UINPCSlot.textures = new Microsoft.Xna.Framework.Graphics.Texture2D[] {
+                UICombatNPCSlot.textures = new Microsoft.Xna.Framework.Graphics.Texture2D[] {
                     Main.heartTexture.Resize(22),
                     Main.itemTexture[3507].Resize(12),
                     Main.EquipPageTexture[0].Resize(12),
@@ -112,7 +112,7 @@ namespace NPCInfo
             if (layerIndex != -1)
             {
                 layers.Insert(layerIndex, new LegacyGameInterfaceLayer(
-                    "NPCInfo: Drop Item",
+                    "NPCInfo: Tooltip",
                     delegate
                     {
                         npcInfoTool.TooltipDraw();
@@ -125,7 +125,12 @@ namespace NPCInfo
 
         public override void AddRecipes()
         {
-            if (!Main.dedServ)
+			if (Config.isOutputDropInfo)
+			{
+				NPCDropInfoUtils.OutputDropInfo();
+				Config.isOutputDropInfo = false;
+			}
+			if (!Main.dedServ)
             {
                 npcInfoTool.CreateModItemDictionary();
             }

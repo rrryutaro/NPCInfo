@@ -44,11 +44,6 @@ namespace NPCInfo
             {
                 NPCInfoUI.instance.Load(npcInfoData);
             }
-
-            if (Config.isOutputDropInfo)
-            {
-                NPCDropInfoUtils.OutputDropInfo();
-            }
         }
     }
 }
