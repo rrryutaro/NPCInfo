@@ -8,6 +8,7 @@ namespace NPCInfo.UIElements
 {
 	public class UICombatNPCSlot : UISlot
 	{
+		public static int SelectedNetID;
 		public static Texture2D[] textures;
 		public static float heightSize = 52;
         public static float npcSize = 46;
@@ -22,6 +23,14 @@ namespace NPCInfo.UIElements
 			SetSlotSize();
 		}
 
+		public override void Click(UIMouseEvent evt)
+		{
+			if (SelectedNetID == npc.netID)
+				SelectedNetID = 0;
+			else
+				SelectedNetID = npc.netID;
+		}
+
 		protected override void SetSlotSize()
 		{
 			this.Width.Set(280, 0f);
@@ -32,7 +41,13 @@ namespace NPCInfo.UIElements
 		{
             try
             {
+				bool isSelected = SelectedNetID == this.npc.netID;
+				var tex = backTexture;
+				if (isSelected)
+					backTexture = Main.inventoryBack14Texture;
 				base.DrawSelf(spriteBatch);
+				if (isSelected)
+					backTexture = tex;
 
 				CalculatedStyle dimensions = base.GetInnerDimensions();
                 float scale = 1f;

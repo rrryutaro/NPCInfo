@@ -2,6 +2,7 @@
 Display combat information of NPC.
 When you move the cursor to NPC information, drop information is displayed.
 By switching the button, information on the NPC that is spawning, information on the item being dropped is displayed.
+The straight line to the closest target among the objects selected by left click is displayed.
 
 - About drop information -
 Drop information is not accurate information.

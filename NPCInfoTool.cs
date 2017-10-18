@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -15,7 +16,8 @@ namespace NPCInfo
     class NPCInfoTool : Tool
 	{
         public NPC targetNPC;
-        public static List<NPCDropInfo> listDropInfo;
+		public Item targetItem;
+		public static List<NPCDropInfo> listDropInfo;
         public static Dictionary<string, Dictionary<string, int>> dicModItemNameToType;
 
 		private static int[] noRate = { ItemID.CopperCoin, ItemID.SilverCoin, ItemID.GoldCoin, ItemID.PlatinumCoin };
@@ -95,10 +97,46 @@ namespace NPCInfo
         internal override void UIUpdate()
         {
             targetNPC = null;
+			targetItem = null;
             base.UIUpdate();
         }
 
-        internal override void TooltipDraw()
+		internal override void UIDraw()
+		{
+			base.UIDraw();
+			if (visible)
+			{
+				if (NPCInfoUI.instance.ViewMode == ViewMode.CombatNPC && UICombatNPCSlot.SelectedNetID != 0)
+				{
+					var player = Main.LocalPlayer;
+					var nearNPC = Main.npc.Where(x => x.active && x.netID == UICombatNPCSlot.SelectedNetID).FindMin(x => Vector2.Distance(x.position, player.position));
+					if (nearNPC != null)
+					{
+						Utils.DrawLine(Main.spriteBatch, player.Center, nearNPC.Center, Color.Red, Color.Red, 1);
+					}
+				}
+				else if (NPCInfoUI.instance.ViewMode == ViewMode.SpawnNPC && UISpawnNPCSlot.SelectedNetID != 0)
+				{
+					var player = Main.LocalPlayer;
+					var nearNPC = Main.npc.Where(x => x.active && x.netID == UISpawnNPCSlot.SelectedNetID).FindMin(x => Vector2.Distance(x.position, player.position));
+					if (nearNPC != null)
+					{
+						Utils.DrawLine(Main.spriteBatch, player.Center, nearNPC.Center, Color.Red, Color.Red, 1);
+					}
+				}
+				else if (NPCInfoUI.instance.ViewMode == ViewMode.DropItem && UIItemSlot.SelectedNetID != 0)
+				{
+					var player = Main.LocalPlayer;
+					var nearItem = Main.item.Where(x => x.active && x.netID == UIItemSlot.SelectedNetID).FindMin(x => Vector2.Distance(x.position, player.position));
+					if (nearItem != null)
+					{
+						Utils.DrawLine(Main.spriteBatch, player.Center, nearItem.Center, Color.Red, Color.Red, 1);
+					}
+				}
+			}
+		}
+
+		internal override void TooltipDraw()
         {
 			if (visible && Config.isDisplayDropInfo && !string.IsNullOrEmpty(tooltip) && targetNPC != null && listDropInfo != null && NPCInfoUI.instance.ViewMode == ViewMode.CombatNPC)
 			{
@@ -172,7 +210,7 @@ namespace NPCInfo
 				Vector2 pos = Main.MouseScreen;
 				pos.X += 16;
 				pos.Y += Main.fontMouseText.MeasureString(tooltip).Y + 20;
-				int maxWidth = UICombatNPCSlot.textures.Sum(x => x.Width) + texts.Sum(x => (int)Main.fontMouseText.MeasureString(x).X) + 44;
+				int maxWidth = UICombatNPCSlot.textures.Sum(x => x.Width) + texts.Sum(x => (int)Main.fontMouseText.MeasureString(x).X) + 46;
 				if (Main.screenWidth < pos.X + maxWidth)
 					pos.X = Main.screenWidth - maxWidth;
 
@@ -182,6 +220,48 @@ namespace NPCInfo
 					pos.X += UICombatNPCSlot.textures[i].Width + 4;
 					Utils.DrawBorderStringFourWay(Main.spriteBatch, Main.fontMouseText, texts[i], pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
 					pos.X += Main.fontMouseText.MeasureString(texts[i]).X + 8;
+				}
+
+				var nearNPC = Main.npc.Where(x => x.active && x.netID == targetNPC.netID).FindMin(x => Vector2.Distance(x.Center, Main.LocalPlayer.Center));
+				if (nearNPC != null)
+				{
+					pos.X = Main.MouseScreen.X + 16;
+					pos.Y += UICombatNPCSlot.textures.Max(x => x.Height) + 4;
+					var nearPos = (Main.LocalPlayer.Center - nearNPC.Center) / 16;
+					var text = $"Near distance: {Math.Abs((int)nearPos.X)} x {Math.Abs((int)nearPos.Y)}";
+					if (Main.screenWidth < pos.X + Main.fontMouseText.MeasureString(text).X + 6)
+						pos.X = Main.screenWidth - (Main.fontMouseText.MeasureString(text).X + 6);
+
+					Utils.DrawBorderStringFourWay(Main.spriteBatch, Main.fontMouseText, text, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+				}
+
+			}
+			else if (visible && !string.IsNullOrEmpty(tooltip) && NPCInfoUI.instance.ViewMode == ViewMode.DropItem)
+			{
+				Main.hoverItemName = tooltip;
+				if (targetItem != null)
+				{
+					Vector2 pos = Main.MouseScreen;
+					pos.X += 16;
+					pos.Y += Main.fontMouseText.MeasureString(tooltip).Y + 20;
+					int count = Main.item.Count(x => x.active && x.netID == targetItem.netID);
+					string text = $"Count: {count}";
+					if (Main.screenWidth < pos.X + Main.fontMouseText.MeasureString(text).X + 6)
+						pos.X = (Main.screenWidth - Main.fontMouseText.MeasureString(text).X + 6);
+
+					Utils.DrawBorderStringFourWay(Main.spriteBatch, Main.fontMouseText, text, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+
+					var nearItem = Main.item.Where(x => x.active && x.netID == targetItem.netID).FindMin(x => Vector2.Distance(x.Center, Main.LocalPlayer.Center));
+					if (nearItem != null)
+					{
+						pos.Y += Main.fontMouseText.MeasureString(text).Y + 4;
+						var nearPos = (Main.LocalPlayer.Center - nearItem.Center) / 16;
+						text = $"Near distance: {Math.Abs((int)nearPos.X)} x {Math.Abs((int)nearPos.Y)}";
+						if (Main.screenWidth < pos.X + Main.fontMouseText.MeasureString(text).X + 6)
+							pos.X = (Main.screenWidth - Main.fontMouseText.MeasureString(text).X + 6);
+
+						Utils.DrawBorderStringFourWay(Main.spriteBatch, Main.fontMouseText, text, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
+					}
 				}
 			}
 			else if (visible && !string.IsNullOrEmpty(tooltip))

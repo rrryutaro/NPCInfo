@@ -52,5 +52,10 @@ namespace NPCInfo
         {
             (new bool[1]).Select(x => x);
         }
+
+		public static TSource FindMin<TSource, TResult>(this IEnumerable<TSource> self, Func<TSource, TResult> selector)
+		{
+			return self.First(c => selector(c).Equals(self.Min(selector)));
+		}
     }
 }

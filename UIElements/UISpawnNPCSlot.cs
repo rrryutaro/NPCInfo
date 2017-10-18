@@ -10,6 +10,7 @@ namespace NPCInfo.UIElements
 {
 	public class UISpawnNPCSlot : UISlot
 	{
+		public static int SelectedNetID;
 		public NPC npc;
 		public int count;
 		public static float npcSize = 46;
@@ -32,11 +33,25 @@ namespace NPCInfo.UIElements
 			SetSlotSize();
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+		public override void Click(UIMouseEvent evt)
+		{
+			if (SelectedNetID == npc.netID)
+				SelectedNetID = 0;
+			else
+				SelectedNetID = npc.netID;
+		}
+
+		protected override void DrawSelf(SpriteBatch spriteBatch)
 		{
             try
             {
+				bool isSelected = SelectedNetID == this.npc.netID;
+				var tex = backTexture;
+				if (isSelected)
+					backTexture = Main.inventoryBack14Texture;
 				base.DrawSelf(spriteBatch);
+				if (isSelected)
+					backTexture = tex;
 
 				CalculatedStyle dimensions = base.GetInnerDimensions();
 				float scale = 1f;
@@ -64,5 +79,7 @@ namespace NPCInfo.UIElements
                 System.Diagnostics.Debug.Write(ex.Message);
             }
         }
+
+
 	}
 }

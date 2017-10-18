@@ -14,6 +14,7 @@ namespace NPCInfo.UIElements
 {
 	class UIItemSlot : UISlot
 	{
+		public static int SelectedNetID;
 		public Item item;
 		public int count;
 
@@ -37,11 +38,25 @@ namespace NPCInfo.UIElements
 			SetSlotSize();
 		}
 
+		public override void Click(UIMouseEvent evt)
+		{
+			if (SelectedNetID == item.netID)
+				SelectedNetID = 0;
+			else
+				SelectedNetID = item.netID;
+		}
+
 		protected override void DrawSelf(SpriteBatch spriteBatch)
 		{
 			try
 			{
+				bool isSelected = SelectedNetID == this.item.netID;
+				var tex = backTexture;
+				if (isSelected)
+					backTexture = Main.inventoryBack14Texture;
 				base.DrawSelf(spriteBatch);
+				if (isSelected)
+					backTexture = tex;
 
 				Vector2 pos = base.GetInnerDimensions().Position() + GetCenterPosition(backTexture, texture, 42);
 				spriteBatch.Draw(texture, pos, Color.White);
@@ -50,6 +65,7 @@ namespace NPCInfo.UIElements
 				if (IsMouseHovering)
 				{
 					Tool.tooltip = item.Name;
+					NPCInfo.instance.npcInfoTool.targetItem = item;
 				}
 			}
 			catch (Exception ex)

@@ -101,8 +101,12 @@ namespace NPCInfo
                 "NPCInfo: NPC Info",
                 delegate
                 {
-                    npcInfoTool.UIUpdate();
-                    npcInfoTool.UIDraw();
+					try
+					{
+						npcInfoTool.UIUpdate();
+						npcInfoTool.UIDraw();
+					}
+					catch { }
                     return true;
                 },
                 InterfaceScaleType.UI)
@@ -115,7 +119,11 @@ namespace NPCInfo
                     "NPCInfo: Tooltip",
                     delegate
                     {
-                        npcInfoTool.TooltipDraw();
+						try
+						{
+							npcInfoTool.TooltipDraw();
+						}
+						catch { }
                         return true;
                     },
                     InterfaceScaleType.UI)
