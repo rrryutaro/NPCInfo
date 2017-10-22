@@ -264,7 +264,7 @@ namespace NPCInfo
 
 				case ViewMode.SpawnNPC:
 					var bFilterTown = btnSpawnNPCFilter.GetValue<SpawnNPCFilter>() == SpawnNPCFilter.HideTownNPC;
-					var npcList = Main.npc.Where(x => x.active && (bFilterTown ? !x.townNPC : true)).GroupBy(x => x.netID);
+					var npcList = Main.npc.Where(x => x.active && x.netID != 0  && (bFilterTown ? !x.townNPC : true)).GroupBy(x => x.netID);
 					if (dicSpawnNPC.Count != npcList.Count() || dicSpawnNPC.Sum(x => x.Value) != npcList.Sum(x => x.Count()))
 					{
 						dicSpawnNPC.Clear();
@@ -276,7 +276,7 @@ namespace NPCInfo
 					break;
 
 				case ViewMode.DropItem:
-					var itemList = Main.item.Where(x => x.active).GroupBy(x => x.netID);
+					var itemList = Main.item.Where(x => x.active && x.netID != 0).GroupBy(x => x.netID);
 					if (dicDropItem.Count != itemList.Count() || dicDropItem.Sum(x=> x.Value) != itemList.Sum(x => x.Sum(y => y.stack)))
 					{
 						dicDropItem.Clear();

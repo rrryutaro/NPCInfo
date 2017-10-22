@@ -205,11 +205,27 @@ namespace NPCInfo
             }
 			else if (visible && !string.IsNullOrEmpty(tooltip) && targetNPC != null && NPCInfoUI.instance.ViewMode == ViewMode.SpawnNPC)
 			{
-				Main.hoverItemName = tooltip;
-				string[] texts = { $"{targetNPC.lifeMax}", $"{targetNPC.defDamage}", $"{targetNPC.defDefense}", $"{targetNPC.knockBackResist:0.##}" };
 				Vector2 pos = Main.MouseScreen;
-				pos.X += 16;
+				var defaultX = pos.X + 16;
+				pos.X = defaultX;
+
+				Main.hoverItemName = tooltip;
 				pos.Y += Main.fontMouseText.MeasureString(tooltip).Y + 20;
+
+				//スポーンNPCの価値を表示する（おおよそ）
+				if (Config.isDisplaySpawnValue)
+				{
+					Item item = new Item();
+					item.value = (int)targetNPC.value;
+					item.buy = true;
+					item.stack = 1;
+					var price = NPCInfoUtils.GetPriceTooltipLine(item, false);
+					pos.X = NPCInfoUtils.GetScreenContainsTextPositionX(defaultX, price.text);
+					Utils.DrawBorderStringFourWay(Main.spriteBatch, Main.fontMouseText, price.text, pos.X, pos.Y, price.overrideColor ?? Color.White, Color.Black, Vector2.Zero, 1f);
+					pos.Y += Main.fontMouseText.MeasureString(price.text).Y + 4;
+				}
+
+				string[] texts = { $"{targetNPC.lifeMax}", $"{targetNPC.defDamage}", $"{targetNPC.defDefense}", $"{targetNPC.knockBackResist:0.##}" };
 				int maxWidth = UICombatNPCSlot.textures.Sum(x => x.Width) + texts.Sum(x => (int)Main.fontMouseText.MeasureString(x).X) + 46;
 				if (Main.screenWidth < pos.X + maxWidth)
 					pos.X = Main.screenWidth - maxWidth;
@@ -229,9 +245,7 @@ namespace NPCInfo
 					pos.Y += UICombatNPCSlot.textures.Max(x => x.Height) + 4;
 					var nearPos = (Main.LocalPlayer.Center - nearNPC.Center) / 16;
 					var text = $"Near distance: {Math.Abs((int)nearPos.X)} x {Math.Abs((int)nearPos.Y)}";
-					if (Main.screenWidth < pos.X + Main.fontMouseText.MeasureString(text).X + 6)
-						pos.X = Main.screenWidth - (Main.fontMouseText.MeasureString(text).X + 6);
-
+					pos.X = NPCInfoUtils.GetScreenContainsTextPositionX(defaultX, text);
 					Utils.DrawBorderStringFourWay(Main.spriteBatch, Main.fontMouseText, text, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
 				}
 
@@ -242,13 +256,21 @@ namespace NPCInfo
 				if (targetItem != null)
 				{
 					Vector2 pos = Main.MouseScreen;
-					pos.X += 16;
+					var defaultX = pos.X + 16;
 					pos.Y += Main.fontMouseText.MeasureString(tooltip).Y + 20;
+
+					//ドロップアイテムの価値を表示する
+					if (Config.isDisplayDropItemValue)
+					{
+						var price = NPCInfoUtils.GetPriceTooltipLine(targetItem);
+						pos.X = NPCInfoUtils.GetScreenContainsTextPositionX(defaultX, price.text);
+						Utils.DrawBorderStringFourWay(Main.spriteBatch, Main.fontMouseText, price.text, pos.X, pos.Y, price.overrideColor ?? Color.White, Color.Black, Vector2.Zero, 1f);
+						pos.Y += Main.fontMouseText.MeasureString(price.text).Y + 4;
+					}
+
 					int count = Main.item.Count(x => x.active && x.netID == targetItem.netID);
 					string text = $"Count: {count}";
-					if (Main.screenWidth < pos.X + Main.fontMouseText.MeasureString(text).X + 6)
-						pos.X = (Main.screenWidth - Main.fontMouseText.MeasureString(text).X + 6);
-
+					pos.X = NPCInfoUtils.GetScreenContainsTextPositionX(defaultX, text);
 					Utils.DrawBorderStringFourWay(Main.spriteBatch, Main.fontMouseText, text, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
 
 					var nearItem = Main.item.Where(x => x.active && x.netID == targetItem.netID).FindMin(x => Vector2.Distance(x.Center, Main.LocalPlayer.Center));
@@ -257,9 +279,7 @@ namespace NPCInfo
 						pos.Y += Main.fontMouseText.MeasureString(text).Y + 4;
 						var nearPos = (Main.LocalPlayer.Center - nearItem.Center) / 16;
 						text = $"Near distance: {Math.Abs((int)nearPos.X)} x {Math.Abs((int)nearPos.Y)}";
-						if (Main.screenWidth < pos.X + Main.fontMouseText.MeasureString(text).X + 6)
-							pos.X = (Main.screenWidth - Main.fontMouseText.MeasureString(text).X + 6);
-
+						pos.X = NPCInfoUtils.GetScreenContainsTextPositionX(defaultX, text);
 						Utils.DrawBorderStringFourWay(Main.spriteBatch, Main.fontMouseText, text, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
 					}
 				}

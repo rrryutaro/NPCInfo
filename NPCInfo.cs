@@ -80,7 +80,10 @@ namespace NPCInfo
             setting.AddBool("isLock", "NPC Info ui position lock", false);
             setting.AddInt("timeOut", "Display time of npc", 5, 60, false);
             setting.AddBool("isDisplayDropInfo", "Display drop info", false);
-        }
+			setting.AddBool("isDisplaySpawnValue", "Display spawn npc value", false);
+			setting.AddBool("isDisplayDropItemValue", "Display drop item value", false);
+			setting.AddBool("isDisplayTooltipItemValue", "Display tooltip item value", false);
+		}
 
         private void UpdateModSettings()
         {
@@ -90,7 +93,10 @@ namespace NPCInfo
                 setting.Get("isLock", ref Config.isLock);
                 setting.Get("timeOut", ref Config.timeOut);
                 setting.Get("isDisplayDropInfo", ref Config.isDisplayDropInfo);
-            }
+				setting.Get("isDisplaySpawnValue", ref Config.isDisplaySpawnValue);
+				setting.Get("isDisplayDropItemValue", ref Config.isDisplayDropItemValue);
+				setting.Get("isDisplayTooltipItemValue", ref Config.isDisplayTooltipItemValue);
+			}
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -144,4 +150,15 @@ namespace NPCInfo
             }
         }
     }
+
+	class NPCInfoGlobalItem : GlobalItem
+	{
+		public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
+		{
+			if (Config.isDisplayTooltipItemValue && Main.npcShop == 0)
+			{
+				tooltips.Add(NPCInfoUtils.GetPriceTooltipLine(item));
+			}
+		}
+	}
 }

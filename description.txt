@@ -4,6 +4,12 @@ When you move the cursor to NPC information, drop information is displayed.
 By switching the button, information on the NPC that is spawning, information on the item being dropped is displayed.
 The straight line to the closest target among the objects selected by left click is displayed.
 
+Display the target value in the tooltip.
+The value of spawn NPC is approximate and there are differences from coins actually dropped.
+
+The presence or absence of information to be displayed on the tooltip can be specified by setting change.
+Modification of setting can be done with Mod Settings Configurator.
+
 - About drop information -
 Drop information is not accurate information.
 To hide it, please set it with config.

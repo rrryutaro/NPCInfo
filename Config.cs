@@ -18,7 +18,10 @@ namespace NPCInfo
                 config.Get("isLock", ref isLock);
                 config.Get("timeOut", ref timeOut);
                 config.Get("isDisplayDropInfo", ref isDisplayDropInfo);
-                config.Get("isOutputDropInfo", ref isOutputDropInfo);
+				config.Get("isDisplaySpawnValue", ref isDisplaySpawnValue);
+				config.Get("isDisplayDropItemValue", ref isDisplayDropItemValue);
+				config.Get("isDisplayTooltipItemValue", ref isDisplayTooltipItemValue);
+				config.Get("isOutputDropInfo", ref isOutputDropInfo);
             }
             else
             {
@@ -32,13 +35,20 @@ namespace NPCInfo
             config.Put("isLock", isLock);
             config.Put("timeOut", timeOut);
             config.Put("isDisplayDropInfo", isDisplayDropInfo);
-            config.Put("isOutputDropInfo", isOutputDropInfo);
+			config.Put("isDisplaySpawnValue", isDisplaySpawnValue);
+			config.Put("isDisplayDropItemValue", isDisplayDropItemValue);
+			config.Put("isDisplayTooltipItemValue", isDisplayTooltipItemValue);
+			config.Put("isOutputDropInfo", isOutputDropInfo);
             config.Save();
         }
 
         public static bool isLock = false;
         public static int timeOut = 30;
         public static bool isDisplayDropInfo = true;
-        public static bool isOutputDropInfo = false;
+		public static bool isDisplaySpawnValue = true;
+		public static bool isDisplayDropItemValue = true;
+		public static bool isDisplayTooltipItemValue = false;
+
+		public static bool isOutputDropInfo = false;
     }
 }
