@@ -11,7 +11,6 @@ namespace NPCInfo.UIElements
 		public static int SelectedNetID;
 		public static Texture2D[] textures;
 		public static float heightSize = 52;
-        public static float npcSize = 46;
 		public NPC npc;
 
         public UICombatNPCSlot(NPC npc)
@@ -20,6 +19,7 @@ namespace NPCInfo.UIElements
 			backTexture = Main.inventoryBack2Texture;
 			Main.instance.LoadNPC(npc.type);
             texture = Main.npcTexture[npc.type];
+			SetNPCFrame(npc);
 			SetSlotSize();
 		}
 
@@ -29,6 +29,31 @@ namespace NPCInfo.UIElements
 				SelectedNetID = 0;
 			else
 				SelectedNetID = npc.netID;
+		}
+
+		public override void DoubleClick(UIMouseEvent evt)
+		{
+			if (Config.isCheatMode)
+			{
+				var tempNpc = NPCInfoUtils.GetActiveNearNPC(npc.netID);
+				if (tempNpc != null)
+				{
+					Main.LocalPlayer.position = tempNpc.Center.Offset(-Main.LocalPlayer.width / 2, tempNpc.height / 2 - Main.LocalPlayer.height);
+					Main.LocalPlayer.fallStart = (int)Main.LocalPlayer.position.Y;
+				}
+			}
+		}
+
+		public override void RightDoubleClick(UIMouseEvent evt)
+		{
+			if (Config.isCheatMode)
+			{
+				var tempNpc = NPCInfoUtils.GetActiveNearNPC(npc.netID);
+				if (tempNpc != null)
+				{
+					tempNpc.position = Main.LocalPlayer.position;
+				}
+			}
 		}
 
 		protected override void SetSlotSize()
@@ -50,17 +75,16 @@ namespace NPCInfo.UIElements
 					backTexture = tex;
 
 				CalculatedStyle dimensions = base.GetInnerDimensions();
-                float scale = 1f;
-                if (npcSize < npc.frame.Width || npcSize < npc.frame.Height)
-                {
-                    scale = npcSize / (float)(npc.frame.Width > npc.frame.Height ? npc.frame.Width : npc.frame.Height);
-                }
 				Vector2 pos = dimensions.Position();
-				SetPosition(npc.frame, npcSize, ref pos);
-                spriteBatch.Draw(texture, pos, new Rectangle?(npc.frame), Color.White, 0, new Vector2(), scale, SpriteEffects.None, 0f);
+				SetPosition(frame, slotNPCSize, ref pos);
+				if (Config.isAnimation)
+				{
+					NextFrame();
+				}
+				spriteBatch.Draw(texture, pos, new Rectangle?(frame), Color.White, 0, new Vector2(), drawScale, SpriteEffects.None, 0f);
                 if (npc.color != default(Color))
                 {
-                    Main.spriteBatch.Draw(texture, pos, new Rectangle?(npc.frame), npc.color, 0, new Vector2(), scale, SpriteEffects.None, 0f);
+                    Main.spriteBatch.Draw(texture, pos, new Rectangle?(frame), npc.color, 0, new Vector2(), drawScale, SpriteEffects.None, 0f);
                 }
 
                 //名称

@@ -53,6 +53,28 @@ namespace NPCInfo
 			return self.First(c => selector(c).Equals(self.Min(selector)));
 		}
 
+		public static NPC GetActiveNearNPC(int netID)
+		{
+			NPC result = null;
+			try
+			{
+				result = Main.npc.Where(x => x.active && x.netID == netID).FindMin(x => Vector2.Distance(x.Center, Main.LocalPlayer.Center));
+			}
+			catch { }
+			return result;
+		}
+
+		public static Item GetActiveNearItem(int netID)
+		{
+			Item result = null;
+			try
+			{
+				result = Main.item.Where(x => x.active && x.netID == netID).FindMin(x => Vector2.Distance(x.Center, Main.LocalPlayer.Center));
+			}
+			catch { }
+			return result;
+		}
+
 		public static float GetScreenContainsTextPositionX(float defaultX, string text)
 		{
 			float result = defaultX;

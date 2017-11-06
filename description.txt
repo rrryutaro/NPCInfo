@@ -21,6 +21,21 @@ By editing the file you can change the drop information.
 Setting isOutputDropInfo of the configuration setting to true causes all NPC drop information to be output when loading mod.
 Since this setting is not displayed in Mod Settings Configurator, please directly edit NPCInfo.json.
 
+- About Cheat Mode -
+When Cheat Mode is true.
+Teleport to the target by left double-click.
+Right double-click to teleport the target to the player.
+
+- About Cheat Mode -
+When Cheat Mode is true.
+Left double-click player teleport to the target.
+Right double-click target teleport to the player.
+
+- About Animation -
+When Animation is true.
+Animate the display of NPC. Also some items to animate.
+By changing the animation speed, you can change the operation speed.
+
 *** Acknowledgments ***
 Most of this Mod's code is based on jopojelly's Recipe Browser.
 I am grateful to Mr. jopojelly for publishing a great code.

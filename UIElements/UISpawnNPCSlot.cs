@@ -13,23 +13,19 @@ namespace NPCInfo.UIElements
 		public static int SelectedNetID;
 		public NPC npc;
 		public int count;
-		public static float npcSize = 46;
-
-		private static int[] multiWidthFrame = {564, 565, 576, 577 };
 
 		public UISpawnNPCSlot(int netID, int count)
 		{
 			npc = new NPC();
 			npc.SetDefaults(netID);
-			if (multiWidthFrame.Contains(netID))
-				npc.frame.Width = texture.Width / 5;
-
 			this.count = count;
 			this.sortOrder = netID;
 
 			backTexture = Main.inventoryBack2Texture;
 			Main.instance.LoadNPC(npc.type);
             texture = Main.npcTexture[npc.type];
+
+			SetNPCFrame(npc);
 			SetSlotSize();
         }
 
@@ -39,6 +35,31 @@ namespace NPCInfo.UIElements
 				SelectedNetID = 0;
 			else
 				SelectedNetID = npc.netID;
+		}
+
+		public override void DoubleClick(UIMouseEvent evt)
+		{
+			if (Config.isCheatMode)
+			{
+				var tempNpc = NPCInfoUtils.GetActiveNearNPC(npc.netID);
+				if (tempNpc != null)
+				{
+					Main.LocalPlayer.position = tempNpc.Center.Offset(-Main.LocalPlayer.width / 2, tempNpc.height / 2 - Main.LocalPlayer.height);
+					Main.LocalPlayer.fallStart = (int)Main.LocalPlayer.position.Y;
+				}
+			}
+		}
+
+		public override void RightDoubleClick(UIMouseEvent evt)
+		{
+			if (Config.isCheatMode)
+			{
+				var tempNpc = NPCInfoUtils.GetActiveNearNPC(npc.netID);
+				if (tempNpc != null)
+				{
+					tempNpc.position = Main.LocalPlayer.position;
+				}
+			}
 		}
 
 		protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -54,17 +75,16 @@ namespace NPCInfo.UIElements
 					backTexture = tex;
 
 				CalculatedStyle dimensions = base.GetInnerDimensions();
-				float scale = 1f;
-				if (npcSize < npc.frame.Width || npcSize < npc.frame.Height)
-				{
-					scale = npcSize / (float)(npc.frame.Width > npc.frame.Height ? npc.frame.Width : npc.frame.Height);
-				}
 				Vector2 pos = dimensions.Position();
-				SetPosition(npc.frame, npcSize, ref pos);
-				spriteBatch.Draw(texture, pos, new Rectangle?(npc.frame), Color.White, 0, new Vector2(), scale, SpriteEffects.None, 0f);
+				SetPosition(frame, slotNPCSize, ref pos);
+				if (Config.isAnimation)
+				{
+					NextFrame();
+				}
+				spriteBatch.Draw(texture, pos, new Rectangle?(frame), Color.White, 0, new Vector2(), drawScale, SpriteEffects.None, 0f);
 				if (npc.color != default(Color))
 				{
-					Main.spriteBatch.Draw(texture, pos, new Rectangle?(npc.frame), npc.color, 0, new Vector2(), scale, SpriteEffects.None, 0f);
+					Main.spriteBatch.Draw(texture, pos, new Rectangle?(frame), npc.color, 0, new Vector2(), drawScale, SpriteEffects.None, 0f);
 				}
 				DrawCount(spriteBatch, count.ToString());
 
@@ -79,7 +99,5 @@ namespace NPCInfo.UIElements
                 System.Diagnostics.Debug.Write(ex.Message);
             }
         }
-
-
 	}
 }

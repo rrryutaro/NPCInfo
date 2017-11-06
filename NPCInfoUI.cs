@@ -264,7 +264,7 @@ namespace NPCInfo
 
 				case ViewMode.SpawnNPC:
 					var bFilterTown = btnSpawnNPCFilter.GetValue<SpawnNPCFilter>() == SpawnNPCFilter.HideTownNPC;
-					var npcList = Main.npc.Where(x => x.active && x.netID != 0  && (bFilterTown ? !x.townNPC : true)).GroupBy(x => x.netID);
+					var npcList = Main.npc.Where(x => x.active && x.netID != 0  && (bFilterTown ? !x.townNPC : true) && x.whoAmI < 200).GroupBy(x => x.netID);
 					if (dicSpawnNPC.Count != npcList.Count() || dicSpawnNPC.Sum(x => x.Value) != npcList.Sum(x => x.Count()))
 					{
 						dicSpawnNPC.Clear();

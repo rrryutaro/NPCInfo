@@ -238,7 +238,7 @@ namespace NPCInfo
 					pos.X += Main.fontMouseText.MeasureString(texts[i]).X + 8;
 				}
 
-				var nearNPC = Main.npc.Where(x => x.active && x.netID == targetNPC.netID).FindMin(x => Vector2.Distance(x.Center, Main.LocalPlayer.Center));
+				var nearNPC = NPCInfoUtils.GetActiveNearNPC(targetNPC.netID);
 				if (nearNPC != null)
 				{
 					pos.X = Main.MouseScreen.X + 16;
@@ -273,7 +273,7 @@ namespace NPCInfo
 					pos.X = NPCInfoUtils.GetScreenContainsTextPositionX(defaultX, text);
 					Utils.DrawBorderStringFourWay(Main.spriteBatch, Main.fontMouseText, text, pos.X, pos.Y, Color.White, Color.Black, Vector2.Zero, 1f);
 
-					var nearItem = Main.item.Where(x => x.active && x.netID == targetItem.netID).FindMin(x => Vector2.Distance(x.Center, Main.LocalPlayer.Center));
+					var nearItem = NPCInfoUtils.GetActiveNearItem(targetItem.netID);
 					if (nearItem != null)
 					{
 						pos.Y += Main.fontMouseText.MeasureString(text).Y + 4;

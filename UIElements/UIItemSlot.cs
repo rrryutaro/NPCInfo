@@ -27,14 +27,8 @@ namespace NPCInfo.UIElements
 			sortOrder = netID;
 
 			texture = Main.itemTexture[item.type];
-			float scale = 1f;
-			float max = Math.Max(texture.Width, texture.Height);
-			if (42 < max)
-			{
-				scale = 42 / max;
-			}
-			texture = texture.Resize((int)(texture.Width * scale), (int)(texture.Height * scale));
 
+			SetItemFrame(item);
 			SetSlotSize();
 		}
 
@@ -44,6 +38,31 @@ namespace NPCInfo.UIElements
 				SelectedNetID = 0;
 			else
 				SelectedNetID = item.netID;
+		}
+
+		public override void DoubleClick(UIMouseEvent evt)
+		{
+			if (Config.isCheatMode)
+			{
+				var tempItem = NPCInfoUtils.GetActiveNearItem(item.netID);
+				if (tempItem != null)
+				{
+					Main.LocalPlayer.position = Main.LocalPlayer.position = tempItem.Center.Offset(-Main.LocalPlayer.width / 2, tempItem.height / 2 - Main.LocalPlayer.height);
+					Main.LocalPlayer.fallStart = (int)Main.LocalPlayer.position.Y;
+				}
+			}
+		}
+
+		public override void RightDoubleClick(UIMouseEvent evt)
+		{
+			if (Config.isCheatMode)
+			{
+				var tempItem = NPCInfoUtils.GetActiveNearItem(item.netID);
+				if (tempItem != null)
+				{
+					tempItem.position = Main.LocalPlayer.position;
+				}
+			}
 		}
 
 		protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -59,7 +78,11 @@ namespace NPCInfo.UIElements
 					backTexture = tex;
 
 				Vector2 pos = base.GetInnerDimensions().Position() + GetCenterPosition(backTexture, texture, 42);
-				spriteBatch.Draw(texture, pos, Color.White);
+				if (Config.isAnimation)
+				{
+					NextFrame();
+				}
+				spriteBatch.Draw(texture, pos, new Rectangle?(frame), Color.White, 0, new Vector2(), drawScale, SpriteEffects.None, 0f);
 				DrawCount(spriteBatch, count.ToString());
 
 				if (IsMouseHovering)
