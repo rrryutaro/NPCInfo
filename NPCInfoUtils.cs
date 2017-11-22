@@ -190,6 +190,11 @@ namespace NPCInfo
 				result.text = Lang.tip[51].Value;
 				result.overrideColor = new Color((int)((byte)(120f * num20)), (int)((byte)(120f * num20)), (int)((byte)(120f * num20)), a);
 			}
+
+			if (result.text == null)
+			{
+				result.text = string.Empty;
+			}
 			return result;
 		}
 	}
