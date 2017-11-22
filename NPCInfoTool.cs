@@ -104,6 +104,10 @@ namespace NPCInfo
 		internal override void UIDraw()
 		{
 			base.UIDraw();
+		}
+
+		internal void UIDrawLine()
+		{
 			if (visible)
 			{
 				if (NPCInfoUI.instance.ViewMode == ViewMode.CombatNPC && UICombatNPCSlot.SelectedNetID != 0)
@@ -112,7 +116,8 @@ namespace NPCInfo
 					var nearNPC = Main.npc.Where(x => x.active && x.netID == UICombatNPCSlot.SelectedNetID).FindMin(x => Vector2.Distance(x.position, player.position));
 					if (nearNPC != null)
 					{
-						Utils.DrawLine(Main.spriteBatch, player.Center, nearNPC.Center, Color.Red, Color.Red, 1);
+						//Utils.DrawLine(Main.spriteBatch, player.Center, nearNPC.Center, Color.Red, Color.Red, 1);
+						DrawUtils.DrawLine(Main.spriteBatch, player.Center, nearNPC.Center, 1, Color.Red);
 					}
 				}
 				else if (NPCInfoUI.instance.ViewMode == ViewMode.SpawnNPC && UISpawnNPCSlot.SelectedNetID != 0)
@@ -121,7 +126,8 @@ namespace NPCInfo
 					var nearNPC = Main.npc.Where(x => x.active && x.netID == UISpawnNPCSlot.SelectedNetID).FindMin(x => Vector2.Distance(x.position, player.position));
 					if (nearNPC != null)
 					{
-						Utils.DrawLine(Main.spriteBatch, player.Center, nearNPC.Center, Color.Red, Color.Red, 1);
+						//Utils.DrawLine(Main.spriteBatch, player.Center, nearNPC.Center, Color.Red, Color.Red, 1);
+						DrawUtils.DrawLine(Main.spriteBatch, player.Center, nearNPC.Center, 1, Color.Red);
 					}
 				}
 				else if (NPCInfoUI.instance.ViewMode == ViewMode.DropItem && UIItemSlot.SelectedNetID != 0)
@@ -130,7 +136,8 @@ namespace NPCInfo
 					var nearItem = Main.item.Where(x => x.active && x.netID == UIItemSlot.SelectedNetID).FindMin(x => Vector2.Distance(x.position, player.position));
 					if (nearItem != null)
 					{
-						Utils.DrawLine(Main.spriteBatch, player.Center, nearItem.Center, Color.Red, Color.Red, 1);
+						//Utils.DrawLine(Main.spriteBatch, player.Center, nearItem.Center, Color.Red, Color.Red, 1);
+						DrawUtils.DrawLine(Main.spriteBatch, player.Center, nearItem.Center, 1, Color.Red);
 					}
 				}
 			}

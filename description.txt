@@ -26,11 +26,6 @@ When Cheat Mode is true.
 Teleport to the target by left double-click.
 Right double-click to teleport the target to the player.
 
-- About Cheat Mode -
-When Cheat Mode is true.
-Left double-click player teleport to the target.
-Right double-click target teleport to the player.
-
 - About Animation -
 When Animation is true.
 Animate the display of NPC. Also some items to animate.

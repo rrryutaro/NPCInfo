@@ -110,23 +110,38 @@ namespace NPCInfo
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int layerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Interface Logic 1"));
-
-            layers.Insert(layerIndex, new LegacyGameInterfaceLayer(
-                "NPCInfo: NPC Info",
-                delegate
-                {
-					try
+			if (layerIndex != -1)
+			{
+				layers.Insert(layerIndex, new LegacyGameInterfaceLayer(
+					"NPCInfo: NPC Info",
+					delegate
 					{
-						npcInfoTool.UIUpdate();
-						npcInfoTool.UIDraw();
-					}
-					catch { }
-                    return true;
-                },
-                InterfaceScaleType.UI)
-            );
+						try
+						{
+							npcInfoTool.UIUpdate();
+							npcInfoTool.UIDraw();
+						}
+						catch { }
+						return true;
+					},
+					InterfaceScaleType.UI)
+				);
+				layers.Insert(layerIndex, new LegacyGameInterfaceLayer(
+					"NPCInfo: Line",
+					delegate
+					{
+						try
+						{
+							npcInfoTool.UIDrawLine();
+						}
+						catch { }
+						return true;
+					},
+					InterfaceScaleType.Game)
+				);
+			}
 
-            layerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+			layerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
             if (layerIndex != -1)
             {
                 layers.Insert(layerIndex, new LegacyGameInterfaceLayer(
@@ -163,10 +178,14 @@ namespace NPCInfo
 	{
 		public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
 		{
-			if (Config.isDisplayTooltipItemValue && Main.npcShop == 0)
+			try
 			{
-				tooltips.Add(NPCInfoUtils.GetPriceTooltipLine(item));
+				if (Config.isDisplayTooltipItemValue && Main.npcShop == 0)
+				{
+					tooltips.Add(NPCInfoUtils.GetPriceTooltipLine(item));
+				}
 			}
+			catch { }
 		}
 	}
 }
