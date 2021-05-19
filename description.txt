@@ -1,4 +1,12 @@
-﻿NPC Info:
+﻿*** v0.0.4.2 -> v0.0.5.0 ***
+I built it with tModLoader v0.11.8.4.
+Configuration is based on tModLoader.
+Configuration in "Mod Settings Configurator" has been abolished.
+Unnecessary settings have been abolished.
+- Display tooltip item value
+- Output drop info
+
+NPC Info:
 Display combat information of NPC.
 When you move the cursor to NPC information, drop information is displayed.
 By switching the button, information on the NPC that is spawning, information on the item being dropped is displayed.
@@ -9,17 +17,6 @@ The value of spawn NPC is approximate and there are differences from coins actua
 
 The presence or absence of information to be displayed on the tooltip can be specified by setting change.
 Modification of setting can be done with Mod Settings Configurator.
-
-- About drop information -
-Drop information is not accurate information.
-To hide it, please set it with config.
-When loading this Mod, output the NPCDropInfo.json file of drop information to the ModLoader folder.
-Drop information also includes information on Thorium, Tremor, and Calamity.
-By editing the file you can change the drop information.
-
-- About the case of wanting to obtain drop information of other Mod -
-Setting isOutputDropInfo of the configuration setting to true causes all NPC drop information to be output when loading mod.
-Since this setting is not displayed in Mod Settings Configurator, please directly edit NPCInfo.json.
 
 - About Cheat Mode -
 When Cheat Mode is true.
@@ -34,5 +31,3 @@ By changing the animation speed, you can change the operation speed.
 *** Acknowledgments ***
 Most of this Mod's code is based on jopojelly's Recipe Browser.
 I am grateful to Mr. jopojelly for publishing a great code.
-In addition, Mod Settings uses Mod Settings Configurator.
-I am grateful to Mr. Flashkirby99 for making the setting of Mod easy.

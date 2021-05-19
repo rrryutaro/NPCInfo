@@ -62,7 +62,7 @@ namespace NPCInfo
             {
                 dicModItemNameToType = new Dictionary<string, Dictionary<string, int>>();
                 Dictionary<string, Mod> mods = new Dictionary<string, Mod>();
-                foreach (var mod in ModLoader.LoadedMods)
+                foreach (var mod in ModLoader.Mods)
                 {
                     mods.Add(mod.Name, mod);
                 }
