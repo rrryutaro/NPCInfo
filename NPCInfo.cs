@@ -1,11 +1,8 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.UI;
 using Terraria.ModLoader;
-using FKTModSettings;
 using NPCInfo.UIElements;
-using Newtonsoft.Json;
 
 namespace NPCInfo
 {
@@ -43,68 +40,7 @@ namespace NPCInfo
 
                 ToggleHotKeyNPCInfo = RegisterHotKey("Toggle NPC Info", "X");
                 npcInfoTool = new NPCInfoTool();
-
-                Config.LoadConfig();
-                LoadedFKTModSettings = ModLoader.GetMod("FKTModSettings") != null;
-                try
-                {
-                    if (LoadedFKTModSettings)
-                    {
-                        LoadModSettings();
-                    }
-                }
-                catch { }
             }
-        }
-
-        public override void PreSaveAndQuit()
-        {
-            Config.SaveValues();
-        }
-
-        public override void PostUpdateInput()
-        {
-            try
-            {
-                if (LoadedFKTModSettings && !Main.gameMenu)
-                {
-                    UpdateModSettings();
-                }
-            }
-            catch { }
-        }
-
-        private void LoadModSettings()
-        {
-            ModSetting setting = ModSettingsAPI.CreateModSettingConfig(this);
-			setting.AddBool("isCheatMode", "Cheat mode", false);
-			setting.AddBool("isLock", "NPC Info ui position lock", false);
-            setting.AddInt("timeOut", "Display time of npc", 5, 60, false);
-            setting.AddBool("isDisplayDropInfo", "Display drop info", false);
-			setting.AddBool("isDisplaySpawnValue", "Display spawn npc value", false);
-			setting.AddBool("isDisplayDropItemValue", "Display drop item value", false);
-			setting.AddBool("isDisplayTooltipItemValue", "Display tooltip item value", false);
-			setting.AddBool("isAnimation", "Animation", false);
-			setting.AddInt("animationSpeed", "Animation speed", 1, 30, false);
-		}
-
-        private void UpdateModSettings()
-        {
-            ModSetting setting;
-            if (ModSettingsAPI.TryGetModSetting(this, out setting))
-            {
-				setting.Get("isCheatMode", ref Config.isCheatMode);
-				setting.Get("isLock", ref Config.isLock);
-                setting.Get("timeOut", ref Config.timeOut);
-                setting.Get("isDisplayDropInfo", ref Config.isDisplayDropInfo);
-				setting.Get("isDisplaySpawnValue", ref Config.isDisplaySpawnValue);
-				setting.Get("isDisplayDropItemValue", ref Config.isDisplayDropItemValue);
-				setting.Get("isDisplayTooltipItemValue", ref Config.isDisplayTooltipItemValue);
-				setting.Get("isAnimation", ref Config.isAnimation);
-				setting.Get("animationSpeed", ref Config.animationSpeed);
-
-				UISlot.frameChangeCount = Config.animationSpeed;
-			}
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -174,18 +110,4 @@ namespace NPCInfo
         }
     }
 
-	class NPCInfoGlobalItem : GlobalItem
-	{
-		public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
-		{
-			try
-			{
-				if (Config.isDisplayTooltipItemValue && Main.npcShop == 0)
-				{
-					tooltips.Add(NPCInfoUtils.GetPriceTooltipLine(item));
-				}
-			}
-			catch { }
-		}
-	}
 }
