@@ -54,7 +54,7 @@ namespace NPCInfo
                 {
                     var info = combatNPC[key];
                     TimeSpan ts = DateTime.Now - info.timeUpdate;
-                    if (ts.TotalSeconds > Config.timeOut)
+                    if (ts.TotalSeconds > ModContent.GetInstance<NPCInfoConfig>().timeOut)
                     {
                         removeKeys.Add(key);
                     }

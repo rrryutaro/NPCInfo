@@ -4,13 +4,13 @@ using Terraria.ModLoader.IO;
 namespace NPCInfo.UIElements
 {
     class UIModState : UIState
-	{
-		internal UserInterface userInterface;
+    {
+        internal UserInterface userInterface;
 
-		public UIModState(UserInterface userInterface)
-		{
-			this.userInterface = userInterface;
-		}
+        public UIModState(UserInterface userInterface)
+        {
+            this.userInterface = userInterface;
+        }
 
         public virtual TagCompound Save()
         {

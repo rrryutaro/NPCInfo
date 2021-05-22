@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.IO;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.UI;
 using Terraria.ModLoader;
@@ -6,8 +7,8 @@ using NPCInfo.UIElements;
 
 namespace NPCInfo
 {
-	class NPCInfo : Mod
-	{
+    class NPCInfo : Mod
+    {
         internal static string pathNPCDropInfo = $@"{Main.SavePath}\NPCDropInfo.json";
 
         internal static NPCInfo instance;
@@ -16,14 +17,14 @@ namespace NPCInfo
         internal NPCInfoTool npcInfoTool;
 
         public NPCInfo()
-		{
-			Properties = new ModProperties()
-			{
-				Autoload = true,
-				AutoloadGores = true,
-				AutoloadSounds = true
-			};
-		}
+        {
+            Properties = new ModProperties()
+            {
+                Autoload = true,
+                AutoloadGores = true,
+                AutoloadSounds = true
+            };
+        }
 
         public override void Load()
         {
@@ -31,6 +32,14 @@ namespace NPCInfo
 
             if (!Main.dedServ)
             {
+                // 旧設定ファイルの削除
+                var oldConfigPath = Path.Combine(Main.SavePath, "Mod Configs", "NPCInfo.json");
+                if (File.Exists(oldConfigPath))
+                {
+                    File.Delete(oldConfigPath);
+                }
+
+
                 UICombatNPCSlot.textures = new Microsoft.Xna.Framework.Graphics.Texture2D[] {
                     Main.heartTexture.Resize(22),
                     Main.itemTexture[3507].Resize(12),
@@ -46,49 +55,49 @@ namespace NPCInfo
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int layerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Interface Logic 1"));
-			if (layerIndex != -1)
-			{
-				layers.Insert(layerIndex, new LegacyGameInterfaceLayer(
-					"NPCInfo: NPC Info",
-					delegate
-					{
-						try
-						{
-							npcInfoTool.UIUpdate();
-							npcInfoTool.UIDraw();
-						}
-						catch { }
-						return true;
-					},
-					InterfaceScaleType.UI)
-				);
-				layers.Insert(layerIndex, new LegacyGameInterfaceLayer(
-					"NPCInfo: Line",
-					delegate
-					{
-						try
-						{
-							npcInfoTool.UIDrawLine();
-						}
-						catch { }
-						return true;
-					},
-					InterfaceScaleType.Game)
-				);
-			}
+            if (layerIndex != -1)
+            {
+                layers.Insert(layerIndex, new LegacyGameInterfaceLayer(
+                    "NPCInfo: NPC Info",
+                    delegate
+                    {
+                        try
+                        {
+                            npcInfoTool.UIUpdate();
+                            npcInfoTool.UIDraw();
+                        }
+                        catch { }
+                        return true;
+                    },
+                    InterfaceScaleType.UI)
+                );
+                layers.Insert(layerIndex, new LegacyGameInterfaceLayer(
+                    "NPCInfo: Line",
+                    delegate
+                    {
+                        try
+                        {
+                            npcInfoTool.UIDrawLine();
+                        }
+                        catch { }
+                        return true;
+                    },
+                    InterfaceScaleType.Game)
+                );
+            }
 
-			layerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+            layerIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
             if (layerIndex != -1)
             {
                 layers.Insert(layerIndex, new LegacyGameInterfaceLayer(
                     "NPCInfo: Tooltip",
                     delegate
                     {
-						try
-						{
-							npcInfoTool.TooltipDraw();
-						}
-						catch { }
+                        try
+                        {
+                            npcInfoTool.TooltipDraw();
+                        }
+                        catch { }
                         return true;
                     },
                     InterfaceScaleType.UI)
@@ -98,12 +107,7 @@ namespace NPCInfo
 
         public override void AddRecipes()
         {
-			if (Config.isOutputDropInfo)
-			{
-				NPCDropInfoUtils.OutputDropInfo();
-				Config.isOutputDropInfo = false;
-			}
-			if (!Main.dedServ)
+            if (!Main.dedServ)
             {
                 npcInfoTool.CreateModItemDictionary();
             }
